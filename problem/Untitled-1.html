@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,3 +67,67 @@ yollar.forEach((yol, index) => {
 </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+<script>
+  const grafik = {
+  A: { B: 2, C: 8 },
+  B: { C: 5, D: 6 },
+  C: { D: 3, E: 2 },
+  D: { E: 1, F: 9 },
+  E: { F: 3 },
+  F: {},
+}
+
+const baslangicNoktasi = "A"
+const bitisNoktasi = "F"
+
+// breath-first search algorithm
+function enKisaGuzergahlariBul(graph, baslangic, bitis) {
+  const kuyruk = [{ node: baslangic, yol: [baslangic], mesafe: 0 }] // queue: kuyruk
+  let enKisaMesafe = Infinity // suana kadar bulunan en kisa mesafeyi tutar.
+  const enKisaGuzergahlar = [] // en kisa guzergah(lar)in tutuldugu dizi (birden fazla olabilir).
+
+  // bu dongu en kisa yolu bulana kadar calisir. eger bulunan yolun mesafesi en kisa mesafeden buyukse bu yol aranmaya devam edilmez. 
+  while (kuyruk.length > 0) {
+    const { node, yol, mesafe } = kuyruk.shift()
+    if (node === bitis && mesafe <= enKisaMesafe) {  // eger mesafe = enKisaMesafe kullansaydim birden fazla cevap bulamayacakti bunun icin mesafe <= enKisaMesafe kullandim.
+      if (mesafe < enKisaMesafe) {
+        enKisaGuzergahlar.length = 0 
+        enKisaMesafe = mesafe
+      }
+      enKisaGuzergahlar.push({ yol, mesafe })
+    }
+    for (const komsu in graph[node]) {  // her adimda yeni yol ve mesafeler kuyruga eklenir.
+      const komsuMesafe = graph[node][komsu]
+      if (!yol.includes(komsu)) { // ayni yoldan birdaha gecmeyecek.
+        const yeniYol = [...yol, komsu]
+        const yeniMesafe = mesafe + komsuMesafe
+        kuyruk.push({ node: komsu, yol: yeniYol, mesafe: yeniMesafe })
+      }
+    }
+  }
+  return enKisaGuzergahlar
+}
+
+
+const enKisaGuzergahlar = enKisaGuzergahlariBul(grafik, baslangicNoktasi, bitisNoktasi)
+if (enKisaGuzergahlar.length > 0) { // eger yol bulunmussa ekrana yazdir.
+  console.log(`En kisa guzergah(lar) ve mesafe(ler):`)
+  enKisaGuzergahlar.forEach((guzergah, index) => { // her guzergah icin yol ve mesafeyi ekrana yazdir.
+    console.log(`Guzergah ${index + 1}: ${guzergah.yol.join(" - ")}`)
+    console.log(`Mesafe: ${guzergah.mesafe}`)
+  })
+}
+</script>
+</body>
+</html>
+>>>>>>> 3c166dd02326edb5a2dfe05429c23b4622501e89
