@@ -1,133 +1,101 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Otomatik Yol Hesaplama</title>
 </head>
 <body>
   
 <script>
-const grafik = {
-  A: { B: 2, C: 8 },
-  B: { C: 5, D: 6 },
-  C: { D: 3, E: 2 },
-  D: { E: 1, F: 9 },
-  E: { F: 3 },
-  F: {}
+class Node {
+  constructor(name) {
+    this.name = name;
+    this.neighbors = [];
+  }
 }
 
-function enKisaYollariBul(grafik, baslangic, bitis) {
-  const yollar = []
-  let enKisaUzaklik = Infinity
-  
-  function dfs(node, yol, uzaklik) {
-    yol.push(node)
-    if (node === bitis) {
-      if (uzaklik < enKisaUzaklik) {
-        enKisaUzaklik = uzaklik
-        yollar.length = 0
-        yollar.push([...yol])
-      } else if (uzaklik === enKisaUzaklik) {
-        yollar.push([...yol])
-      }
-    } else {
-      for (let komsu in grafik[node]) {
-        if (!yol.includes(komsu)) {
-          const mesafe = grafik[node][komsu]
-          dfs(komsu, yol, uzaklik + mesafe)
-          yol.pop()
+class Graph {
+  constructor() {
+    this.nodes = {};
+  }
+
+  addNode(name) {
+    this.nodes[name] = new Node(name);
+  }
+
+  addEdge(node1, node2, distance) {
+    this.nodes[node1].neighbors.push({ node: node2, distance });
+    this.nodes[node2].neighbors.push({ node: node1, distance });
+  }
+
+  findShortestPaths(start, end) {
+    const visited = {};
+    const paths = [];
+    const shortestPaths = [];
+    let shortestDistance = Infinity;
+
+    const dfs = (currentNode, currentPath, currentDistance) => {
+      visited[currentNode] = true;
+      currentPath.push(currentNode);
+
+      if (currentNode === end) {
+        if (currentDistance < shortestDistance) {
+          shortestDistance = currentDistance;
+          shortestPaths.length = 0;
+          shortestPaths.push([...currentPath]);
+        } else if (currentDistance === shortestDistance) {
+          shortestPaths.push([...currentPath]);
+        }
+        paths.push([...currentPath]);
+      } else {
+        for (const neighborInfo of this.nodes[currentNode].neighbors) {
+          if (!visited[neighborInfo.node]) {
+            dfs(
+              neighborInfo.node,
+              currentPath,
+              currentDistance + neighborInfo.distance
+            );
+          }
         }
       }
-    }
-  }
 
-  dfs(baslangic, [], 0)
-  return yollar
+      visited[currentNode] = false;
+      currentPath.pop();
+    };
+
+    dfs(start, [], 0);
+
+    return [shortestPaths, shortestDistance];
+  }
 }
 
-const baslangic = 'A'
-const bitis = 'F'
-const yollar = enKisaYollariBul(grafik, baslangic, bitis)
+const graph = new Graph();
 
-console.log(`Başlangıç noktası: ${baslangic}`)
-console.log(`Bitiş noktası: ${bitis}`)
-console.log(`En kısa yollar ve uzaklıklar:`)
-yollar.forEach((yol, index) => {
-  const uzaklik = yol.reduce((toplam, node, index, arr) => {
-    if (index < arr.length - 1) {
-      return toplam + grafik[node][arr[index + 1]]
-    }
-    return toplam
-  }, 0)
-  console.log(`Yol ${index + 1}: ${yol.join(' -> ')}`)
-  console.log(`Uzaklık: ${uzaklik}`)
-})
+graph.addNode("A");
+graph.addNode("B");
+graph.addNode("C");
+graph.addNode("D");
+graph.addNode("E");
+graph.addNode("F");
+
+graph.addEdge("A", "B", 2);
+graph.addEdge("A", "C", 8);
+graph.addEdge("B", "C", 5);
+graph.addEdge("B", "D", 6);
+graph.addEdge("C", "D", 3);
+graph.addEdge("C", "E", 2);
+graph.addEdge("D", "E", 1);
+graph.addEdge("D", "F", 9);
+graph.addEdge("E", "F", 3);
+
+const [shortestPaths, shortestDistance] = graph.findShortestPaths("A", "F");
+
+console.log(`En Kısa Yollar:`);
+for (const path of shortestPaths) {
+  console.log(`${path.join(" -> ")} (Toplam Mesafe: ${shortestDistance})`);
+}
+
 </script>
 </body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  
-<script>
-  const grafik = {
-  A: { B: 2, C: 8 },
-  B: { C: 5, D: 6 },
-  C: { D: 3, E: 2 },
-  D: { E: 1, F: 9 },
-  E: { F: 3 },
-  F: {},
-}
-
-const baslangicNoktasi = "A"
-const bitisNoktasi = "F"
-
-// breath-first search algorithm
-function enKisaGuzergahlariBul(graph, baslangic, bitis) {
-  const kuyruk = [{ node: baslangic, yol: [baslangic], mesafe: 0 }] // queue: kuyruk
-  let enKisaMesafe = Infinity // suana kadar bulunan en kisa mesafeyi tutar.
-  const enKisaGuzergahlar = [] // en kisa guzergah(lar)in tutuldugu dizi (birden fazla olabilir).
-
-  // bu dongu en kisa yolu bulana kadar calisir. eger bulunan yolun mesafesi en kisa mesafeden buyukse bu yol aranmaya devam edilmez. 
-  while (kuyruk.length > 0) {
-    const { node, yol, mesafe } = kuyruk.shift()
-    if (node === bitis && mesafe <= enKisaMesafe) {  // eger mesafe = enKisaMesafe kullansaydim birden fazla cevap bulamayacakti bunun icin mesafe <= enKisaMesafe kullandim.
-      if (mesafe < enKisaMesafe) {
-        enKisaGuzergahlar.length = 0 
-        enKisaMesafe = mesafe
-      }
-      enKisaGuzergahlar.push({ yol, mesafe })
-    }
-    for (const komsu in graph[node]) {  // her adimda yeni yol ve mesafeler kuyruga eklenir.
-      const komsuMesafe = graph[node][komsu]
-      if (!yol.includes(komsu)) { // ayni yoldan birdaha gecmeyecek.
-        const yeniYol = [...yol, komsu]
-        const yeniMesafe = mesafe + komsuMesafe
-        kuyruk.push({ node: komsu, yol: yeniYol, mesafe: yeniMesafe })
-      }
-    }
-  }
-  return enKisaGuzergahlar
-}
-
-
-const enKisaGuzergahlar = enKisaGuzergahlariBul(grafik, baslangicNoktasi, bitisNoktasi)
-if (enKisaGuzergahlar.length > 0) { // eger yol bulunmussa ekrana yazdir.
-  console.log(`En kisa guzergah(lar) ve mesafe(ler):`)
-  enKisaGuzergahlar.forEach((guzergah, index) => { // her guzergah icin yol ve mesafeyi ekrana yazdir.
-    console.log(`Guzergah ${index + 1}: ${guzergah.yol.join(" - ")}`)
-    console.log(`Mesafe: ${guzergah.mesafe}`)
-  })
-}
-</script>
-</body>
-</html>
->>>>>>> 3c166dd02326edb5a2dfe05429c23b4622501e89
