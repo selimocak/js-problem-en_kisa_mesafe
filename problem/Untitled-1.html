@@ -7,6 +7,62 @@
 </head>
 <body>
   
-  <script src="x.js"></script>
+<script>
+const grafik = {
+  A: { B: 2, C: 8 },
+  B: { C: 5, D: 6 },
+  C: { D: 3, E: 2 },
+  D: { E: 1, F: 9 },
+  E: { F: 3 },
+  F: {}
+}
+
+function enKisaYollariBul(grafik, baslangic, bitis) {
+  const yollar = []
+  let enKisaUzaklik = Infinity
+  
+  function dfs(node, yol, uzaklik) {
+    yol.push(node)
+    if (node === bitis) {
+      if (uzaklik < enKisaUzaklik) {
+        enKisaUzaklik = uzaklik
+        yollar.length = 0
+        yollar.push([...yol])
+      } else if (uzaklik === enKisaUzaklik) {
+        yollar.push([...yol])
+      }
+    } else {
+      for (let komsu in grafik[node]) {
+        if (!yol.includes(komsu)) {
+          const mesafe = grafik[node][komsu]
+          dfs(komsu, yol, uzaklik + mesafe)
+          yol.pop()
+        }
+      }
+    }
+  }
+
+  dfs(baslangic, [], 0)
+  return yollar
+}
+
+const baslangic = 'A'
+const bitis = 'F'
+const yollar = enKisaYollariBul(grafik, baslangic, bitis)
+
+console.log(`Başlangıç noktası: ${baslangic}`)
+console.log(`Bitiş noktası: ${bitis}`)
+console.log(`En kısa yollar ve uzaklıklar:`)
+yollar.forEach((yol, index) => {
+  const uzaklik = yol.reduce((toplam, node, index, arr) => {
+    if (index < arr.length - 1) {
+      return toplam + grafik[node][arr[index + 1]]
+    }
+    return toplam
+  }, 0)
+  console.log(`Yol ${index + 1}: ${yol.join(' -> ')}`)
+  console.log(`Uzaklık: ${uzaklik}`)
+})
+</script>
 </body>
 </html>
