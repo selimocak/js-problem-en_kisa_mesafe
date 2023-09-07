@@ -1,101 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Otomatik Yol Hesaplama</title>
-</head>
-<body>
-  
-<script>
-class Node {
-  constructor(name) {
-    this.name = name;
-    this.neighbors = [];
-  }
-}
-
-class Graph {
-  constructor() {
-    this.nodes = {};
-  }
-
-  addNode(name) {
-    this.nodes[name] = new Node(name);
-  }
-
-  addEdge(node1, node2, distance) {
-    this.nodes[node1].neighbors.push({ node: node2, distance });
-    this.nodes[node2].neighbors.push({ node: node1, distance });
-  }
-
-  findShortestPaths(start, end) {
-    const visited = {};
-    const paths = [];
-    const shortestPaths = [];
-    let shortestDistance = Infinity;
-
-    const dfs = (currentNode, currentPath, currentDistance) => {
-      visited[currentNode] = true;
-      currentPath.push(currentNode);
-
-      if (currentNode === end) {
-        if (currentDistance < shortestDistance) {
-          shortestDistance = currentDistance;
-          shortestPaths.length = 0;
-          shortestPaths.push([...currentPath]);
-        } else if (currentDistance === shortestDistance) {
-          shortestPaths.push([...currentPath]);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>x</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(name) {
+          this.name = name 
+          this.neighbors = []
         }
-        paths.push([...currentPath]);
-      } else {
-        for (const neighborInfo of this.nodes[currentNode].neighbors) {
-          if (!visited[neighborInfo.node]) {
-            dfs(
-              neighborInfo.node,
-              currentPath,
-              currentDistance + neighborInfo.distance
-            );
-          }
+
+        addNeighbor(neighbor, distance) {
+          this.neighbors.push({ node: neighbor, distance })
         }
       }
 
-      visited[currentNode] = false;
-      currentPath.pop();
-    };
+      // Dugumleri olusturun
+      const A = new Node("A")
+      const B = new Node("B")
+      const C = new Node("C")
+      const D = new Node("D")
+      const E = new Node("E")
+      const F = new Node("F")
 
-    dfs(start, [], 0);
+      // Dugumler arasindaki mesafeleri ve komsuluklari belirtin
+      A.addNeighbor(B, 2)
+      A.addNeighbor(C, 8)
+      B.addNeighbor(C, 5)
+      B.addNeighbor(D, 6)
+      C.addNeighbor(D, 3)
+      C.addNeighbor(E, 2)
+      D.addNeighbor(E, 1)
+      D.addNeighbor(F, 9)
+      E.addNeighbor(F, 3)
 
-    return [shortestPaths, shortestDistance];
-  }
-}
+      // Baslangiç ve bitis dugumlerini belirleyin
+      const startNode = A
+      const endNode = F
 
-const graph = new Graph();
+      // Tum yollari hesaplayan islev
+      function findAllPaths(
+        startNode,
+        endNode,
+        currentPath = [],
+        currentDistance = 0,
+        allPaths = []
+      ) {
+        currentPath.push(startNode.name)
 
-graph.addNode("A");
-graph.addNode("B");
-graph.addNode("C");
-graph.addNode("D");
-graph.addNode("E");
-graph.addNode("F");
+        if (startNode === endNode) {
+          allPaths.push({
+            path: currentPath.slice(),
+            distance: currentDistance,
+          })
+        } else {
+          for (const { node, distance } of startNode.neighbors) {
+            if (!currentPath.includes(node.name)) {
+              findAllPaths(
+                node,
+                endNode,
+                currentPath,
+                currentDistance + distance,
+                allPaths
+              )
+            }
+          }
+        }
 
-graph.addEdge("A", "B", 2);
-graph.addEdge("A", "C", 8);
-graph.addEdge("B", "C", 5);
-graph.addEdge("B", "D", 6);
-graph.addEdge("C", "D", 3);
-graph.addEdge("C", "E", 2);
-graph.addEdge("D", "E", 1);
-graph.addEdge("D", "F", 9);
-graph.addEdge("E", "F", 3);
+        currentPath.pop()
+        return allPaths
+      }
 
-const [shortestPaths, shortestDistance] = graph.findShortestPaths("A", "F");
+      // Tum yollari bulun
+      const allPaths = findAllPaths(startNode, endNode)
 
-console.log(`En Kısa Yollar:`);
-for (const path of shortestPaths) {
-  console.log(`${path.join(" -> ")} (Toplam Mesafe: ${shortestDistance})`);
-}
+      if (allPaths.length > 0) {
+        // En kisa yolun mesafesini bulun
+        const shortestDistance = Math.min(
+          ...allPaths.map((path) => path.distance)
+        )
 
-</script>
-</body>
+        // En kisa yollari filtreleyin ve gosterin
+        const shortestPaths = allPaths.filter(
+          (path) => path.distance === shortestDistance
+        )
+
+        console.log(`En kisa yollar:`)
+        shortestPaths.forEach((path, index) => {
+          console.log(
+            `Yol ${index + 1}: ${path.path.join(" -> ")} (Mesafe: ${
+              path.distance
+            } km)`
+          )
+        })
+      }
+    </script>
+  </body>
 </html>
+
+
